@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -12,10 +13,12 @@ struct Request{
 
 class StatReader{
     public:
-    StatReader(TransportCatalogue& map);
+    StatReader(TransportCatalogue& map, std::istream& input = std::cin, std::ostream& output = std::cout);
 
     private:
     TransportCatalogue& map_;
+    std::istream& input_;
+    std::ostream& output_;
     std::vector<Request> requests;
 
     void StartParsRequests();

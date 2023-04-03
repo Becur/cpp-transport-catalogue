@@ -21,7 +21,7 @@ struct Bus{
     std::vector<Stop*> stops;
     bool circular;
     int count_unique_stop = 0;
-    double lenght = -1;
+    double length = -1;
     int path = 0;
 };
 
@@ -35,9 +35,9 @@ class TransportCatalogue{
 
     const Stop* GetStop(const std::string& name_stop) const;
 
-    void SetLenghts(std::string name_stop, std::unordered_map<std::string, int> lenght_to_stop);
+    void SetLengths(const std::string& name_stop, const std::unordered_map<std::string, int>& length_to_stop);
 
-    int GetLenght(const Stop* lstop, const Stop* rstop) const;
+    int GetLength(const Stop* lstop, const Stop* rstop) const;
     
     private:
     std::deque<Stop> stops_;
@@ -50,9 +50,9 @@ class TransportCatalogue{
         size_t operator()(const std::pair<const Stop*, const Stop*> pair) const;
     };
     
-    std::unordered_map<std::pair<const Stop*, const Stop*>, int, HasherRefsStop> lenghts;
+    std::unordered_map<std::pair<const Stop*, const Stop*>, int, HasherRefsStop> lengths;
 
-    void CalculationLenght(Bus* bus);
+    void CalculateLength(Bus* bus);
 
-    void CalculationPath(Bus* bus);
+    void CalculatePath(Bus* bus);
 };
