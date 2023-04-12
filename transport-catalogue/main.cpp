@@ -1,9 +1,7 @@
-#include "input_reader.h"
+#include "json_reader.h"
 #include "transport_catalogue.h"
-#include "stat_reader.h"
 
-int main(){
+int main() {
     TransportCatalogue map;
-    InputReader input(map);
-    StatReader stat(map);
+    JsonReader reader(map);
 }

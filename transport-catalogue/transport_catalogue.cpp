@@ -1,8 +1,7 @@
-#include <utility>
-#include <algorithm>
-#include <numeric>
-
 #include "transport_catalogue.h"
+#include "geo.h"
+
+#include <algorithm>
 
 using std::move;
 
@@ -41,9 +40,9 @@ const Bus* TransportCatalogue::GetBus(const std::string& name_bus){
 }
 
 void TransportCatalogue::CalculateLength(Bus* bus){
-    for(int i = 1; i < bus->stops.size(); ++i){
-        bus->length += ComputeDistance({bus->stops[i - 1]->latitude, bus->stops[i - 1]->longitude}, 
-                                        {bus->stops[i]->latitude, bus->stops[i]->longitude});
+    for(size_t i = 1; i < bus->stops.size(); ++i){
+        bus->length += geo::ComputeDistance(geo::Coordinates({bus->stops[i - 1]->latitude, bus->stops[i - 1]->longitude}), 
+        geo::Coordinates({bus->stops[i]->latitude, bus->stops[i]->longitude}));
     }
     bus->length *= (bus->circular) ? 1 : 2;
 }
@@ -65,7 +64,7 @@ void TransportCatalogue::SetLengths(const std::string& name_stop, const std::uno
 }
 
 void TransportCatalogue::CalculatePath(Bus* bus){
-    for(int i = 1; i < bus->stops.size(); ++i){
+    for(size_t i = 1; i < bus->stops.size(); ++i){
         bus->path += GetLength(bus->stops[i - 1], bus->stops[i]);
     }
     if(!bus->circular){
@@ -79,4 +78,12 @@ int TransportCatalogue::GetLength(const Stop* lstop, const Stop* rstop) const{
     return (lengths.count({lstop, rstop}))
             ? lengths.at({lstop, rstop})
             : lengths.at({rstop, lstop});
+}
+
+const std::deque<Bus>& TransportCatalogue::GetBuses() const{
+    return buses_;
+}
+
+const std::deque<Stop>& TransportCatalogue::GetStops() const{
+    return stops_;
 }

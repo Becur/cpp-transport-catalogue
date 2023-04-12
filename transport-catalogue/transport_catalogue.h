@@ -1,29 +1,11 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <deque>
+#include "domain.h"
+
 #include <unordered_map>
-#include <string_view>
-#include <set>
-
-#include "geo.h"
-
-struct Stop{
-    std::string name_stop;
-    double latitude;
-    double longitude;
-    std::set<std::string_view, std::less<>> buses;
-};
-
-struct Bus{
-    std::string name_bus;
-    std::vector<Stop*> stops;
-    bool circular;
-    int count_unique_stop = 0;
-    double length = -1;
-    int path = 0;
-};
+#include <deque>
+#include <string>
+#include <vector>
 
 class TransportCatalogue{
     public:
@@ -38,7 +20,9 @@ class TransportCatalogue{
     void SetLengths(const std::string& name_stop, const std::unordered_map<std::string, int>& length_to_stop);
 
     int GetLength(const Stop* lstop, const Stop* rstop) const;
-    
+
+    const std::deque<Bus>& GetBuses() const;
+    const std::deque<Stop>& GetStops() const;
     private:
     std::deque<Stop> stops_;
     std::unordered_map<std::string_view, Stop*> ref_stop;
