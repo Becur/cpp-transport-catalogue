@@ -3,6 +3,7 @@
 #include "json.h"
 #include "transport_catalogue.h"
 #include "map_renderer.h"
+#include "json_builder.h"
 
 #include <iostream>
 #include <string_view>
@@ -19,6 +20,7 @@ class JsonReader{
     std::vector <const json::Node*> queue_stops;
     std::vector <const json::Node*> queue_buses;
     std::vector <std::pair <std::string_view, const json::Node*>> queue_lengths;
+    json::Builder array = json::Builder{};
 
     void CreateQueue();
 
@@ -30,9 +32,9 @@ class JsonReader{
 
     void PrintStat();
 
-    void PrintBus(const json::Node* node);
+    json::Builder& PrintBus(const json::Node* node);
 
-    void PrintStop(const json::Node* node);
+    json::Builder& PrintStop(const json::Node* node);
 
-    void PrintMap(const json::Node* node);
+    json::Builder& PrintMap(const json::Node* node);
 };
