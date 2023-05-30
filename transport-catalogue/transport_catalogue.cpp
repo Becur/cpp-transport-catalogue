@@ -26,13 +26,12 @@ std::vector<std::string> stops, bool circular){
     [&](Stop* stop){ stop->buses.insert(buses_.front().name_bus);});
 }
 
-const Bus* TransportCatalogue::GetBus(const std::string& name_bus){
+const Bus* TransportCatalogue::GetBus(const std::string& name_bus) {
     if(!ref_bus.count(name_bus)){
         return nullptr;
     }
     Bus* bus = ref_bus.at(name_bus);
-    if(bus->length == -1){
-        bus->length = 0;
+    if(bus->length == 0){
         CalculateLength(bus);
         CalculatePath(bus);
     }

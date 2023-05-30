@@ -23,7 +23,7 @@ struct Bus{
     std::vector<Stop*> stops;
     bool circular;
     int count_unique_stop = 0;
-    double length = -1;
+    double length = 0;
     int path = 0;
 };
 
