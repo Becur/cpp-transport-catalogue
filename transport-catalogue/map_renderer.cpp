@@ -10,12 +10,12 @@ using json::Node;
 using std::move;
 using svg::Color;
 
-MapRenderer::MapRenderer(const TransportCatalogue& map, const json::Dict& settings)
+MapRenderer::MapRenderer(const TransportCatalogue& map, const render_settings::Settings& settings)
 :map_(map)
 , settings_(settings){}
 
 void MapRenderer::PrintMap(std::ostream& output){
-    if((!settings_.empty()) && (doc_.Empty())){
+    if(doc_.Empty()){
         SetSettings();
         PreparationBuses();
         DrawLineBuses();
@@ -36,8 +36,8 @@ void MapRenderer::SetSettings(){
         }
     }
     projector = SphereProjector(coordinates.begin(), coordinates.end(),
-    settings_.at("width"s).AsDouble(), settings_.at("height"s).AsDouble(),
-    settings_.at("padding"s).AsDouble());
+    settings_.width(), settings_.height(),
+    settings_.padding());
 
 }
 
@@ -53,7 +53,7 @@ void MapRenderer::PreparationBuses(){
 }
 
 void MapRenderer::DrawLineBuses(){
-    ParseColorPalette(settings_.at("color_palette"s));
+    ParseColorPalette();
     int i = 0;
     for(const auto* bus : buses_){
         if(bus->stops.empty()){
@@ -61,7 +61,7 @@ void MapRenderer::DrawLineBuses(){
         }
         svg::Polyline polyline;
         polyline
-        .SetStrokeWidth(settings_.at("line_width"s).AsDouble())
+        .SetStrokeWidth(settings_.line_width())
         .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
         .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND)
         .SetFillColor(svg::NoneColor)
@@ -85,26 +85,25 @@ void MapRenderer::DrawLineBuses(){
     }
 }
 
-void MapRenderer::ParseColorPalette(const Node& node){
-    color_palette.reserve(node.AsArray().size());
-    for(const auto& color : node.AsArray()){
+void MapRenderer::ParseColorPalette(){
+    color_palette.reserve(settings_.color_palette_size());
+    for(const auto& color : settings_.color_palette()){
         color_palette.push_back(ParseColor(color));
     }
 }
 
-Color MapRenderer::ParseColor(const Node& node) const{
-    if(node.IsString()){
-        return Color(node.AsString());
+Color MapRenderer::ParseColor(const render_settings::Color& color) const{
+    if(color.has_color()){
+        return Color(color.color().word());
     }
     else{
-        const auto& nums = node.AsArray();
-        if(nums.size() == 3){
-            return Color(svg::Rgb(nums[0].AsInt(),
-            nums[1].AsInt(), nums[2].AsInt()));
+        if(color.has_rgb()){
+            return Color(svg::Rgb(color.rgb().red(),
+            color.rgb().green(), color.rgb().blue()));
         }
         else{
-            return Color(svg::Rgba(nums[0].AsInt(),
-            nums[1].AsInt(), nums[2].AsInt(), nums[3].AsDouble()));
+            return Color(svg::Rgba(color.rgba().rgb().red(),
+            color.rgba().rgb().green(), color.rgba().rgb().blue(), color.rgba().alpha()));
         }
     }
 }
@@ -128,9 +127,8 @@ void MapRenderer::CreateNameBus(svg::Point point, std::string name_bus, Color co
     svg::Text name;
     name
     .SetPosition(point)
-    .SetOffset({settings_.at("bus_label_offset"s).AsArray()[0].AsDouble(),
-    settings_.at("bus_label_offset"s).AsArray()[1].AsDouble()})
-    .SetFontSize(settings_.at("bus_label_font_size"s).AsInt())
+    .SetOffset({settings_.bus_label_offset(0), settings_.bus_label_offset(1)})
+    .SetFontSize(settings_.bus_label_font_size())
     .SetFontFamily("Verdana"s)
     .SetFontWeight("bold"s)
     .SetData(name_bus);
@@ -141,11 +139,11 @@ void MapRenderer::CreateNameBus(svg::Point point, std::string name_bus, Color co
     name
     .SetFillColor(color);
 
-    Color under_color = ParseColor(settings_.at("underlayer_color"s));
+    Color under_color = ParseColor(settings_.underlayer_color());
     base
     .SetFillColor(under_color)
     .SetStrokeColor(move(under_color))
-    .SetStrokeWidth(settings_.at("underlayer_width"s).AsDouble())
+    .SetStrokeWidth(settings_.underlayer_width())
     .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
     .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
     doc_.Add(move(base));
@@ -177,7 +175,7 @@ void MapRenderer::CreateCircleStop(svg::Point point){
     circle
     .SetCenter(point)
     .SetFillColor(Color("white"s))
-    .SetRadius(settings_.at("stop_radius"s).AsDouble());
+    .SetRadius(settings_.stop_radius());
     doc_.Add(move(circle));
 }
 
@@ -193,9 +191,9 @@ void MapRenderer::CreateNameStop(svg::Point point, std::string name_stop){
     svg::Text name;
     name
     .SetPosition(point)
-    .SetOffset({settings_.at("stop_label_offset"s).AsArray()[0].AsDouble(),
-    settings_.at("stop_label_offset"s).AsArray()[1].AsDouble()})
-    .SetFontSize(settings_.at("stop_label_font_size"s).AsInt())
+    .SetOffset({settings_.stop_label_offset(0),
+    settings_.stop_label_offset(1)})
+    .SetFontSize(settings_.stop_label_font_size())
     .SetFontFamily("Verdana"s)
     .SetData(name_stop);
 
@@ -205,11 +203,11 @@ void MapRenderer::CreateNameStop(svg::Point point, std::string name_stop){
     name
     .SetFillColor(Color("black"s));
 
-    Color under_color = ParseColor(settings_.at("underlayer_color"s));
+    Color under_color = ParseColor(settings_.underlayer_color());
     base
     .SetFillColor(under_color)
     .SetStrokeColor(move(under_color))
-    .SetStrokeWidth(settings_.at("underlayer_width"s).AsDouble())
+    .SetStrokeWidth(settings_.underlayer_width())
     .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
     .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
     doc_.Add(move(base));

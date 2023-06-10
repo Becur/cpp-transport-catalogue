@@ -9,15 +9,15 @@
 
 class TransportCatalogue{
     public:
-    void AddStop(Stop stop);
+    void AddStop(Stop&& stop);
 
-    void AddBus(std::string name_bus, std::vector<std::string> stops, bool circular);
+    void AddBus(std::string&& name_bus, std::vector<std::string>&& stops, bool circular);
 
-    const Bus* GetBus(const std::string& name_bus);
+    const Bus* GetBus(const std::string& name_bus) const;
 
     const Stop* GetStop(const std::string& name_stop) const;
 
-    void SetLengths(const std::string& name_stop, const std::unordered_map<std::string, int>& length_to_stop);
+    void SetLengths(std::string&& name_stop, std::unordered_map<std::string, int>&& length_to_stop);
 
     int GetLength(const Stop* lstop, const Stop* rstop) const;
 
@@ -36,7 +36,7 @@ class TransportCatalogue{
     
     std::unordered_map<std::pair<const Stop*, const Stop*>, int, HasherRefsStop> lengths;
 
-    void CalculateLength(Bus* bus);
+    void CalculateLength(Bus* bus) const;
 
-    void CalculatePath(Bus* bus);
+    void CalculatePath(Bus* bus) const;
 };

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package transport;
+
+message Stop{
+    string name = 1;
+    double latitude = 2;
+    double longitude = 3;
+}
+
+message Bus{
+    string name = 1;
+    repeated string name_stop = 2;
+    bool circular = 3;
+}
+
+message Lenghts{
+    string name_stop = 1;
+    repeated string other_stop = 3;
+    repeated int32 lenght_to_other_stop = 4;
+}
+
+message Catalogue{
+    repeated Stop stop = 1;
+    repeated Bus bus = 2;
+    repeated Lenghts lenghts = 3;
+}

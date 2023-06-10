@@ -2,19 +2,21 @@
 #include "json.h"
 #include "transport_catalogue.h"
 
+#include <transport_catalogue.pb.h>
+
 #include <string>
 #include <vector>
 #include <ostream>
 
 class MapRenderer{
 public:
-    MapRenderer(const TransportCatalogue& map, const json::Dict& settings);
+    MapRenderer(const TransportCatalogue& map, const render_settings::Settings& settings);
 
     void PrintMap(std::ostream& output);
     
 private:
     const TransportCatalogue& map_;
-    const json::Dict& settings_;
+    const render_settings::Settings& settings_;
     svg::Document doc_;
     SphereProjector projector;
     std::vector<const Bus*> buses_;
@@ -25,9 +27,9 @@ private:
 
     void PreparationBuses();
 
-    void ParseColorPalette(const json::Node& node);
+    void ParseColorPalette();
 
-    svg::Color ParseColor(const json::Node& node) const;
+    svg::Color ParseColor(const render_settings::Color& color) const;
 
     void DrawLineBuses();
 

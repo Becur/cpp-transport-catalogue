@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "svg.proto";
+import "data_catalogue.proto";
+import "transport_router.proto";
+import "graph.proto";
+
+message ObjectProto{
+    transport.Catalogue catalogue = 1;
+    render_settings.Settings settings = 2;
+    save.Graph graph = 3;
+    save.RoutesInternalData routes_internal_data = 4;
+    save.TransportRoute transport_route = 5;
+}

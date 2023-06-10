@@ -5,18 +5,18 @@
 
 using std::move;
 
-void TransportCatalogue::AddStop(Stop stop){
+void TransportCatalogue::AddStop(Stop&& stop){
     stops_.push_front(move(stop));
     ref_stop[std::string_view(stops_.front().name_stop)] = &stops_.front();
 }
 
-void TransportCatalogue::AddBus(std::string name_bus, 
-std::vector<std::string> stops, bool circular){
+void TransportCatalogue::AddBus(std::string&& name_bus, 
+std::vector<std::string>&& stops, bool circular){
     std::vector<Stop*> ref_stops;
     ref_stops.reserve(stops.size());
     int count_uniq_stops = 0;
     for(std::string& stop : stops){
-        auto ref = ref_stop[stop];
+        auto ref = ref_stop[std::move(stop)];
         count_uniq_stops += (std::find(ref_stops.begin(), ref_stops.end(), ref) == ref_stops.end()) ? 1 : 0;
         ref_stops.push_back(ref);
     }
@@ -26,19 +26,19 @@ std::vector<std::string> stops, bool circular){
     [&](Stop* stop){ stop->buses.insert(buses_.front().name_bus);});
 }
 
-const Bus* TransportCatalogue::GetBus(const std::string& name_bus) {
+const Bus* TransportCatalogue::GetBus(const std::string& name_bus) const {
     if(!ref_bus.count(name_bus)){
         return nullptr;
     }
-    Bus* bus = ref_bus.at(name_bus);
+    const Bus* bus = ref_bus.at(name_bus);
     if(bus->length == 0){
-        CalculateLength(bus);
-        CalculatePath(bus);
+        CalculateLength(const_cast<Bus*>(bus));
+        CalculatePath(const_cast<Bus*>(bus));
     }
     return bus;
 }
 
-void TransportCatalogue::CalculateLength(Bus* bus){
+void TransportCatalogue::CalculateLength(Bus* bus) const{
     for(size_t i = 1; i < bus->stops.size(); ++i){
         bus->length += geo::ComputeDistance(geo::Coordinates({bus->stops[i - 1]->latitude, bus->stops[i - 1]->longitude}), 
         geo::Coordinates({bus->stops[i]->latitude, bus->stops[i]->longitude}));
@@ -56,13 +56,13 @@ size_t TransportCatalogue::HasherRefsStop::operator()(const std::pair<const Stop
     return first_stop * 37 + second_stop;
 }
 
-void TransportCatalogue::SetLengths(const std::string& name_stop, const std::unordered_map<std::string, int>& length_to_stop){
-    for(const auto& [to_stop, length] : length_to_stop){
+void TransportCatalogue::SetLengths(std::string&& name_stop,  std::unordered_map<std::string, int>&& length_to_stop){
+    for(const auto& [to_stop, length] :  move(length_to_stop)){
         lengths[{ref_stop[name_stop], ref_stop[to_stop]}] = length;
     }
 }
 
-void TransportCatalogue::CalculatePath(Bus* bus){
+void TransportCatalogue::CalculatePath(Bus* bus) const{
     for(size_t i = 1; i < bus->stops.size(); ++i){
         bus->path += GetLength(bus->stops[i - 1], bus->stops[i]);
     }

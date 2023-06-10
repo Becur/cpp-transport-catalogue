@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package render_settings;
+
+message RGB{
+    int32 red = 1;
+    int32 green = 2;
+    int32 blue = 3;
+}
+
+message RGBA{
+    RGB rgb = 1;
+    double alpha = 2;
+}
+
+message ColorWord{
+    string word = 1;
+}
+
+message Color{
+    RGB rgb = 1;
+    RGBA rgba = 2;
+    ColorWord color = 3;
+}
+
+message Settings{
+    double width = 1;
+    double height = 2;
+    double padding = 3;
+    double stop_radius = 4;
+    double line_width = 5;
+    int32 bus_label_font_size = 6;
+    repeated double bus_label_offset = 7;
+    int32 stop_label_font_size = 8;
+    repeated double stop_label_offset = 9;
+    Color underlayer_color = 10;
+    double underlayer_width = 11;
+    repeated Color color_palette = 12;
+}

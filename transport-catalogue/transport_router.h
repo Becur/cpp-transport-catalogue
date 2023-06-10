@@ -10,6 +10,16 @@
 #include <optional>
 #include <memory>
 
+struct SaveTransportRouter{
+    std::vector<graph::Edge<double>> edges;
+    std::vector<std::vector<graph::EdgeId>> incidence_lists;
+    graph::Router<double>::RoutesInternalData routes_internal_data;
+    int bus_wait_time;
+    double bus_velocity;
+    std::unordered_map<graph::EdgeId, std::string> routes;
+    std::unordered_map<size_t, std::string> indexes_stops;
+};
+
 enum class TypeRouteElement{
     WAIT,
     BUS
@@ -55,8 +65,16 @@ struct DataRoute{
 class TransportRouter{
 public:
     TransportRouter(const TransportCatalogue& catalog, int bus_wait_time, double bus_velocity);
+
+    TransportRouter(const TransportCatalogue& catalog, SaveTransportRouter&& save);
     
     std::optional<DataRoute> GetRoute(const std::string& start_stop, const std::string& finish_stop);
+
+    std::pair<std::vector<graph::Edge<double>>, std::vector<std::vector<graph::EdgeId>>> SaveGraph();
+
+    graph::Router<double>::RoutesInternalData SaveRouter();
+
+    std::pair<std::unordered_map<graph::EdgeId, std::string>, std::unordered_map<size_t, std::string>> Save() const; 
 private:
     const TransportCatalogue& catalog_;
     int bus_wait_time_;
@@ -71,12 +89,12 @@ private:
     void CreateStartVertexes();
 
     template<typename InputIt>
-    void GreateEdges(InputIt start_stop, InputIt finish_stop, 
+    void CreateEdges(InputIt start_stop, InputIt finish_stop, 
     graph::DirectedWeightedGraph<double>& graph, const Bus* bus);
 };
 
 template<typename InputIt>
-void TransportRouter::GreateEdges(InputIt start_stop, InputIt finish_stop, 
+void TransportRouter::CreateEdges(InputIt start_stop, InputIt finish_stop, 
 graph::DirectedWeightedGraph<double>& graph, const Bus* bus){
     size_t size_container = std::distance(start_stop, finish_stop);
     std::vector<std::vector<double>> edges_weight(size_container - 1, std::vector<double>(size_container, 0.0));

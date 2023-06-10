@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package save;
+
+message Edge{
+    int32 from = 1;
+    int32 to = 2;
+    double weight = 3;
+    int32 count = 4;
+}
+
+message Graph{
+    repeated Edge edge = 1;
+    repeated int32 incidence_lists = 2;
+    repeated int32 size_list = 3;
+}
